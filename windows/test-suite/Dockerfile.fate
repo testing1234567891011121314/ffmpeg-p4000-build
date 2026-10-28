@@ -1,0 +1,12 @@
+ARG BUILDER_IMAGE=ffmpeg-p4000-builder
+FROM ${BUILDER_IMAGE}
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+ENV DEBIAN_FRONTEND=noninteractive
+# Wine runs Windows test executables; rsync retrieves upstream FATE samples.
+RUN apt-get update && apt-get install -y --no-install-recommends wine wine64 rsync \
+ && rm -rf /var/lib/apt/lists/*
+ENV WINEARCH=win64
+ENV WINEPREFIX=/tmp/fate-wine
+ENV WINEDEBUG=-all
+COPY run-fate.sh /usr/local/bin/run-fate.sh
+ENTRYPOINT ["bash", "/usr/local/bin/run-fate.sh"]
